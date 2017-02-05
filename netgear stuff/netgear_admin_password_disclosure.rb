@@ -13,11 +13,11 @@ class MetasploitModule < Msf::Auxiliary
     super(update_info(info,
       'Name'           => 'NETGEAR Administrator Password Disclosure',
       'Description'    => %q{
-        This module will collect the the password for the `admin` user. 
+        This module will collect the the password for the `admin` user.
         The exploit will not complete if password recovery is set on the router.
         The password is recieved by passing the token generated from `unauth.cgi`
         to `passwordrecovered.cgi`. This exploit works on many different NETGEAR
-        products. The full list of affected productsis available here: 
+        products. The full list of affected productsis available here:
         http://pastebin.com/dB4bTgxz
       },
       'Author'         =>
@@ -27,7 +27,7 @@ class MetasploitModule < Msf::Auxiliary
         ],
       'References'     =>
         [
-          [ 'CVE', 'CVE-2017-5521' ],
+          [ 'CVE', '2017-5521' ],
           [ 'URL', 'https://www.trustwave.com/Resources/Security-Advisories/Advisories/TWSL2017-003/?fid=8911' ],
           [ 'URL', 'http://thehackernews.com/2017/01/Netgear-router-password-hacking.html'],
           [ 'URL', 'https://www.trustwave.com/Resources/SpiderLabs-Blog/CVE-2017-5521--Bypassing-Authentication-on-NETGEAR-Routers/'],
@@ -113,7 +113,5 @@ class MetasploitModule < Msf::Auxiliary
       print_error('Router is not a NETGEAR router')
       return Exploit::CheckCode::Safe
     end
-  
   end
-
 end
