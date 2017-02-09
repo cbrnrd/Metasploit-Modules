@@ -92,12 +92,13 @@ class MetasploitModule < Msf::Auxiliary
       username = scrape(raw_html, "Router Admin Username", "Router Admin Password")
       password = scrape(raw_html, "Router Admin Password", "You can")
       if username.nil? || password.nil?
-        return Exploit::CheckCode::Safe
-      else  
-        username = username.strip!
-        password = password.strip!
+        print_error("#{rhost} returned empty credentials")
+        return
       end
-      if username == "" || password == ""
+      username.strip!
+      password.strip!
+
+      if username.empty? || password.empty?
         print_error("No Creds found")
       else
         print_good("Creds found: #{username}/#{password}")
