@@ -43,21 +43,28 @@ class MetasploitModule < Msf::Auxiliary
 #taken from Dolibarr login utility, not really sure if it will work or not
 #Requests the login page which discloses the hardware, if it's an R7000 or R6400, return Detected
 def check
-  res = send_request_raw({
-    'method' => 'HEAD',
-    'uri'    => normalize_uri(@uri)
-  })
-      # TODO: fix line 52, this isn't working right
-      #This is supposed to parse the WWW-Authenticate: Basic realm="ROUTER HARDWARE"
-      m = res.body.match(/Basic realm="NETGEAR R7000"/ || /Basic realm="NETGEAR R6400"/)
 
-      #TODO: fix this workaround and regex stuff
-      if m != nil
-        return Exploit::CheckCode::Safe
-      else
+    res = send_request_cgi({'uri'=>'/'})
+    if res.nil?
+      fail_with(Failure::Unreachable, 'Connection timed out.')
+    end
+
+    # Checks for the `WWW-Authenticate` header in the response
+    if res.headers["WWW-Authenticate"]
+      data = res.to_s
+      marker_one = "Basic realm=\""
+      marker_two = "\""
+      model = data[/#{marker_one}(.*?)#{marker_two}/m, 1]
+      print_status("Router is a NETGEAR router")
+      if model == "R7000" || model == "R6400"
+        print_good("Router is vulnerable (NETGEAR #{model})")
         return Exploit::CheckCode::Detected
       end
-end
+    else 
+      print_error('Router is not a NETGEAR router')
+      return Exploit::CheckCode::Safe
+    end
+  end
 
   def run
     #Main Function
