@@ -6,8 +6,8 @@
 require 'msf/core'
 require 'rex'
 
-class MetasploitModule < Msf::Auxiliary
-  include Msf::Exploit::Remote::HttpClient #For sending the http request
+class MetasploitModule < Msf:Exploit::Remote
+  include Msf::Exploit::Remote::HttpClient
   include Rex::Proto::Http
 
   def initialize(info = {})
@@ -35,21 +35,24 @@ class MetasploitModule < Msf::Auxiliary
 
     register_options(
       [
-        OptString.new('RHOST', [true, 'The remote target address', nil]),
-        OptString.new('CMD',   [true, 'Command line to execute', nil ]),
+        OptString.new('CMD',        [true, 'Command line to execute', nil ]),
+        OptBool.new('ATTEMPTLOGIN', [false, 'Attempt to use USER and PASS for advanced fingerprinting', false]),
+        OptString.new('USER', [false, 'Username to log in with (only if ATTEMPTLOGIN is true)', nil]),
+        OptString.new('PASS', [false, 'Password to log in with (only if ATTEMPTLOGIN is true)', nil])
       ], self.class)
     end
 
-#taken from Dolibarr login utility, not really sure if it will work or not
-#Requests the login page which discloses the hardware, if it's an R7000 or R6400, return Detected
-def check
+  # TODO finish optional login
+  # Requests the login page which discloses the hardware, if it's an R7000 or R6400, return Detected
+  def check
 
+    user = datastore['USER']
+    pass = datastore['PASS']
     res = send_request_cgi({'uri'=>'/'})
     if res.nil?
       fail_with(Failure::Unreachable, 'Connection timed out.')
     end
-
-    # Checks for the `WWW-Authenticate` header in the response
+     # Checks for the `WWW-Authenticate` header in the response
     if res.headers["WWW-Authenticate"]
       data = res.to_s
       marker_one = "Basic realm=\""
