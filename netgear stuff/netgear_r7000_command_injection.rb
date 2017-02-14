@@ -9,7 +9,6 @@ class MetasploitModule < Msf:Exploit::Remote
   Rank = ExcellentRanking
 
   include Msf::Exploit::Remote::HttpClient
-  include Rex::Proto::Http
 
   def initialize(info = {})
     super(update_info(info,
