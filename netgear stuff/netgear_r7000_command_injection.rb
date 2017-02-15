@@ -30,7 +30,9 @@ class MetasploitModule < Msf::Exploit::Remote
         [
           [ 'EDB', '40889'],
           [ 'URL', 'http://labs.idefense.com/intelligence/vulnerabilities/display.php?id=305'],
-          [ 'URL', 'https://www.kb.cert.org/vuls/id/582384']
+          [ 'URL', 'https://www.kb.cert.org/vuls/id/582384'],
+          [ 'URL', 'http://kb.netgear.com/000036386/CVE-2016-582384'],
+          [ 'CVE', '2016-6277']
         ],
       'DisclosureDate' => 'Dec 06 2016',
       'Payload'        =>
