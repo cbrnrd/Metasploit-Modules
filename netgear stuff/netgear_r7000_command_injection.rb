@@ -50,7 +50,7 @@ class MetasploitModule < Msf::Exploit::Remote
   # Requests the login page which discloses the hardware, if it's an R7000 or R6400, return Detected
   def check
     res = send_request_cgi({'uri'=>'/'})
-    if res.nil?
+    unless res
       fail_with(Failure::Unreachable, 'Connection timed out.')
     end
      # Checks for the `WWW-Authenticate` header in the response
