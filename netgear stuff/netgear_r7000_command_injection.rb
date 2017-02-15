@@ -43,7 +43,7 @@ class MetasploitModule < Msf::Exploit::Remote
 
     register_options(
       [
-        OptString.new('CMD',        [true, 'Command line to execute', nil ])
+        Opt::RPORT(80)
       ], self.class)
     end
 
