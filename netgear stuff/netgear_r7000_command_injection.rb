@@ -24,7 +24,7 @@ class MetasploitModule < Msf::Exploit::Remote
       'Privileged'           => false,
       'Arch'                 => [ARCH_CMD],
       'Targets'              => [
-        [ 'Netgear firmware v1.0.7.2_1.1.93', { } ]
+        [ 'Automatic Target', { } ]
       ],
       'References'           =>
         [
