@@ -70,7 +70,6 @@ class MetasploitModule < Msf::Exploit::Remote
     end
   end
 
-  
   # Mostly from ddwrt_cgibin_exec.rb
   def exploit
     is_vuln = check
