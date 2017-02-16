@@ -61,10 +61,12 @@ class MetasploitModule < Msf::Exploit::Remote
       marker_one = "Basic realm=\""
       marker_two = "\""
       model = data[/#{marker_one}(.*?)#{marker_two}/m, 1]
-      print_status("Router is a NETGEAR router")
+      print_status("Router is a NETGEAR router (#{model})")
       if model == "R7000" || model == "R6400"
         print_good("Router is vulnerable (NETGEAR #{model})")
         return CheckCode::Detected
+      else
+        return CheckCode::Safe
       end
     else
       print_error('Router is not a NETGEAR router')
