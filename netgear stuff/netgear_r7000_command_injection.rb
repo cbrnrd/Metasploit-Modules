@@ -67,7 +67,7 @@ class MetasploitModule < Msf::Exploit::Remote
       model = scrape(data, marker_one, marker_two)
       vprint_status("Router is a NETGEAR router (#{model})")
       if model == 'NETGEAR R7000' || model == 'NETGEAR R6400'
-        print_good("Router could be vulnerable (NETGEAR #{model})")
+        print_good("Router could be vulnerable (#{model})")
         return CheckCode::Detected
       else
         return CheckCode::Safe
