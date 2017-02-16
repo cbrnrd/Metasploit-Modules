@@ -38,8 +38,8 @@ class MetasploitModule < Msf::Exploit::Remote
       'Payload'        =>
         {
           'Space'       => 1024,
-          'DisableNops' => true,
-          'EncoderType' => Msf::Encoder::Type::CmdUnixIfs,
+          'DisableNops' => true
+          #'EncoderType' => Msf::Encoder::Type::CmdUnixIfs,
         }
     ))
 
