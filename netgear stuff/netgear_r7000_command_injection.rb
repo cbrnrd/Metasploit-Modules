@@ -64,7 +64,7 @@ class MetasploitModule < Msf::Exploit::Remote
       data = res.to_s
       marker_one = "Basic realm=\""
       marker_two = "\""
-      model = scrape(data, marker_one, market_two)
+      model = scrape(data, marker_one, marker_two)
       print_status("Router is a NETGEAR router (#{model})")
       if model == 'R7000' || model == 'R6400'
         print_good("Router could be vulnerable (NETGEAR #{model})")
