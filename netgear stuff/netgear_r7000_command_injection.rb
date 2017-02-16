@@ -74,7 +74,7 @@ class MetasploitModule < Msf::Exploit::Remote
     end
   end
 
-  # Mostly from ddwrt_cgibin_exec.rb
+  # Mostly from ddwrt_cgibin_exec.rb, it's essentially the same exploit
   def exploit
     is_vuln = check
     if is_vuln != CheckCode::Detected
