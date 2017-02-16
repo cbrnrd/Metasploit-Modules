@@ -18,11 +18,11 @@ class MetasploitModule < Msf::Exploit::Remote
         Netgear R7000 and R6400 router firmware version 1.0.7.2_1.1.93 and possibly earlier.
       },
       'License'              => MSF_LICENSE,
-      'Platform'             => 'linux',
+      'Platform'             => 'unix',
       'Author'               => ['thecarterb', 'Acew0rm'],
       'DefaultTarget'        => 0,
       'Privileged'           => false,
-      'Arch'                 => [ARCH_X86, ARCH_X64],
+      'Arch'                 => [ARCH_CMD],
       'Targets'              => [
         [ 'Automatic Target', { } ]
       ],
