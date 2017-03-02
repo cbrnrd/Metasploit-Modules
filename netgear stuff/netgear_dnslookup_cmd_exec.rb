@@ -33,7 +33,6 @@ class MetasploitModule < Msf::Exploit::Remote
           [ 'CVE', '2017-6334']
         ],
       'DisclosureDate' => 'Feb 25 2017',
-      # 'DefaultOptions'  => { 'WfsDelay' => 10}
     ))
 
     register_options(
@@ -55,6 +54,7 @@ class MetasploitModule < Msf::Exploit::Remote
     if res.nil?
       fail_with(Failure::Unreachable, 'Connection timed out.')
     end
+    
      # Checks for the `WWW-Authenticate` header in the response
     if res.headers["WWW-Authenticate"]
       data = res.to_s
