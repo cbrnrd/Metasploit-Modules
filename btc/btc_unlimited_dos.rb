@@ -18,7 +18,7 @@ class MetasploitModule < Msf::Auxiliary
       'Name'           => 'Bitcoin Unlimited Denial of Service',
       'Description'    => %q{
         This module exploits a NULL pointer deference
-        in XTHIN Bitcoin Unlimited to cause a denial of service.
+        in XTHIN nodes to cause a denial of service.
       },
       'Author'         => [
         'thecarterb',         # Metasploit Module
