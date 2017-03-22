@@ -18,7 +18,11 @@ class MetasploitModule < Msf::Exploit::Remote
           The exploit will wait 10 seconds to get the shell, so don't get impatient
           and cancel it too early.
       },
-      'Author'         => 'thecarterb',
+      'Author'         => 
+      [ 
+        'thecarterb',     # Metasploit module
+        'Daniel Teixeira' # PoC & original code
+      ],
       'References'     =>
         [
           [ 'EDB' => '41666' ]
