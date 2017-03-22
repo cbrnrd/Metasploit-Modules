@@ -12,7 +12,7 @@ class MetasploitModule < Msf::Exploit::Remote
 
   def initialize(info = {})
     super(update_info(info,
-      'Name'           => 'Disk Sorter Enterprise\'GET\' Buffer Overflow',
+      'Name'           => 'Disk Sorter Enterprise \'GET\' Buffer Overflow',
       'Description'    => %q{
           This module exploits a buffer overflow in Disk Sorter enterprise.
           The exploit will wait 10 seconds to get the shell, so don't get impatient
