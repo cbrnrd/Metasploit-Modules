@@ -7,8 +7,6 @@ require 'msf/core'
 
 class MetasploitModule < Msf::Auxiliary
 
-  include Msf::Exploit::Remote::HttpClient
-
   def initialize(info = {})
     super(update_info(info,
       'Name' => 'Shodan Honeyscore Client',
@@ -24,8 +22,12 @@ class MetasploitModule < Msf::Auxiliary
         https://honeyscore.shodan.io/
       },
       'Author' =>
-        [ 'thecarterb' ],
-      'License' => MSF_LICENSE
+        [ 'thecarterb' ],  # Thanks to @rwhitcroft, @h00die and @wvu-r7 for the improvements and review!
+      'License' => MSF_LICENSE,
+      'References' =>
+        [
+          [ 'URL', 'https://honeyscore.shodan.io/']
+        ]
       )
     )
 
@@ -42,11 +44,18 @@ class MetasploitModule < Msf::Auxiliary
 
   def print_score(score)
     tgt = datastore['TARGET']
-    print_status("#{tgt} honeyscore: #{score}")
+    print_status("#{tgt} honeyscore: #{score}/1.0")
   end
 
   def run
     key = datastore['SHODAN_APIKEY']
+
+    # Check the length of the key (should be 32 chars)
+    if key.length != 32
+      print_error('Invalid API key (Not long enough)')
+      return
+    end
+
     tgt = datastore['TARGET']
     print_status("Scanning #{tgt}")
     cli = Rex::Proto::Http::Client.new('api.shodan.io', 443, {}, true)
@@ -66,26 +75,22 @@ class MetasploitModule < Msf::Auxiliary
       return
     end
 
-    score = res.to_s.to_f  # Change the score to a float to be able to determine value in the checks
+    score = res.body.to_f  # Change the score to a float to be able to determine value in the checks
 
     if score == 0
       print_error("#{tgt} is not a honeypot")
-      print_score(score)
     elsif score < 0.4 && score != 0.0
       print_error("#{tgt} is probably not a honeypot")
-      print_score(score)
     elsif score > 0.4 && score < 0.6
       print_status("#{tgt} might be a honeypot")
-      print_score(score)
     elsif score > 0.6 && score < 1.0
       print_good("#{tgt} is probably a honeypot")
-      print_score(score)
     elsif score == 1.0
       print_good("#{tgt} is definitely a honeypot")
-      print_score(score)
-    else  # We shouldn't ever get here as the previous check should catch an unexpected response
+    else  # We shouldn't ever get here as the previous checks should catch an unexpected response
       print_error('An unexpected error occured.')
       return
     end
+    print_score(score)
   end
 end
