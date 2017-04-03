@@ -3,6 +3,8 @@
 # Current source: https://github.com/rapid7/metasploit-framework
 ##
 
+######### THIS IS NOT GOING TO BE FINISHED
+
 require 'msf/core'
 
 
