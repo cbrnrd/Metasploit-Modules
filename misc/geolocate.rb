@@ -19,6 +19,8 @@ class MetasploitModule < Msf::Auxiliary
         This module uses a GeoIP API to locate the location
         of a given IP address. Even though an external API is being
         used, a API key is not needed for the module to work properly.
+        The shown longitude and latitude values are estimations.
+        If you want a more exact location, use the `wlan_geolocate` module.
       },
       'Author'         => [ 'Carter Brainerd <0xCB@protonmail.com>' ],
       'License'        => MSF_LICENSE
@@ -36,7 +38,7 @@ class MetasploitModule < Msf::Auxiliary
     "https://maps.google.com/?q=#{lat},#{long}"
   end
 
-  def ip_valid?(host)
+  def valid_ipv4?(host)
     block = /\d{,2}|1\d{2}|2[0-4]\d|25[0-5]/
     re = /\A#{block}\.#{block}\.#{block}\.#{block}\z/
     return re =~ host
@@ -49,9 +51,11 @@ class MetasploitModule < Msf::Auxiliary
     rhosts.each do |host|
 
       host.strip!  # Just in cast there are spaces in there
-      if ip_valid?(host) != 0  # Check if each ip address is valid
-        print_error("#{host} is not a valid IP address.")
-        next
+      if host.length <= 15
+        if valid_ipv4?(host) != 0  # Check if each ip address is valid
+          print_error("#{host} is not a valid IP address.")
+          next
+        end
       end
 
       # Because we're requesting an external site, we aren't actually requesting `rhost`
@@ -74,7 +78,7 @@ class MetasploitModule < Msf::Auxiliary
       end
 
       parsed = JSON.parse(res.body)  # Make it fun to use (hash)
-
+      puts parsed
       print_line
       print_status("Data for #{host}")
       print_line("  Country: #{parsed['country_name']} (#{parsed['country_code']})")  # Print the country and country country code
