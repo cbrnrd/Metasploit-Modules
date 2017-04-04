@@ -36,12 +36,23 @@ class MetasploitModule < Msf::Auxiliary
     "https://maps.google.com/?q=#{lat},#{long}"
   end
 
+  def ip_valid?(host)
+    block = /\d{,2}|1\d{2}|2[0-4]\d|25[0-5]/
+    re = /\A#{block}\.#{block}\.#{block}\.#{block}\z/
+    return re =~ host
+  end
+
+
   def run
     raw_rhosts = datastore['RHOSTS']
     rhosts = raw_rhosts.split(',')
     rhosts.each do |host|
 
       host.strip!  # Just in cast there are spaces in there
+      if ip_valid?(host) != 0  # Check if each ip address is valid
+        print_error("#{host} is not a valid IP address.")
+        next
+      end
 
       # Because we're requesting an external site, we aren't actually requesting `rhost`
       # We're requesting the API and passing `rhost` in the URI.
@@ -54,12 +65,12 @@ class MetasploitModule < Msf::Auxiliary
 
       if res.nil?
         print_error('Got an empty response from the API')
-        return
+        next
       end
 
       if res.code != 200
         print_error("Got an unexpected response from the API (Code: #{res.code})")
-        return
+        next
       end
 
       parsed = JSON.parse(res.body)  # Make it fun to use (hash)
