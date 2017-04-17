@@ -60,9 +60,9 @@ class MetasploitModule < Msf::Exploit::Local
     if exist?('C:\\Program Files\\VirusChaser\\scanner.exe')
       puts "File Exists"
       Exploit::CheckCode::Appears 
+    else
+      Exploit::CheckCode::Safe
     end
-
-    Exploit::CheckCode::Safe
   end
 
   def payload_complete
