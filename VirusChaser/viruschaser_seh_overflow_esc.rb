@@ -21,7 +21,7 @@ class MetasploitModule < Msf::Exploit::Local
           be achieved to get escalated privileges.
       },
       'License'       => MSF_LICENSE,
-      'DisclosureDate'=> 'Apr 14 2017'
+      'DisclosureDate'=> 'Apr 14 2017',
       'Author'        =>
         [
           'Carter Brainerd',  # Metasploit Module
