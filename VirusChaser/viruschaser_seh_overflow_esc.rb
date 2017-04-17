@@ -56,7 +56,11 @@ class MetasploitModule < Msf::Exploit::Local
       return false
     end
 
-    Exploit::CheckCode::Appears if exist?('C:\\Program Files\\VirusChaser\\scanner.exe')
+    vprint_status('Checking for vulnerable executable.')
+    if exist?('C:\\Program Files\\VirusChaser\\scanner.exe')
+      puts "File Exists"
+      Exploit::CheckCode::Appears 
+    end
 
     Exploit::CheckCode::Safe
   end
